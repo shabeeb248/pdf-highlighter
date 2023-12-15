@@ -25,9 +25,15 @@ def deleteOutput():
     # st.success("Deletion ÷Completed")
 
 
-for dir in directories:
-    if not os.path.exists(dir):
-        os.makedirs(dir, exist_ok=True)
+try:
+    for dir in directories:
+        if not os.path.exists(dir):
+            os.makedirs(dir, exist_ok=True)
+            print("DIRECTORIES CREATED")
+        else:
+            print("DIRECTORY ALREADY EXIST")
+except Exception as e:
+    ('Failed to create folders  Reason: %s' % ( e))
 
 # Keyword lists
 list_1 = [' freeze ', ' froze ', ' frozen ', ' freezing ', ' cease ', ' ceasement ', ' cessation ', ' ceasing ', 
