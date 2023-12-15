@@ -25,15 +25,16 @@ def deleteOutput():
     # st.success("Deletion ÷Completed")
 
 
-try:
-    for dir in directories:
-        if not os.path.exists(dir):
-            os.makedirs(dir, exist_ok=True)
-            print("DIRECTORIES CREATED")
-        else:
-            print("DIRECTORY ALREADY EXIST")
-except Exception as e:
-    ('Failed to create folders  Reason: %s' % ( e))
+def createFolders():
+    try:
+        for dir in directories:
+            if not os.path.exists(dir):
+                os.makedirs(dir, exist_ok=True)
+                print("DIRECTORIES CREATED")
+            else:
+                print("DIRECTORY ALREADY EXIST")
+    except Exception as e:
+        ('Failed to create folders  Reason: %s' % ( e))
 
 # Keyword lists
 list_1 = [' freeze ', ' froze ', ' frozen ', ' freezing ', ' cease ', ' ceasement ', ' cessation ', ' ceasing ', 
@@ -136,6 +137,7 @@ def highlight_instances(page, instances, color):
 # Streamlit UI
 st.set_page_config(page_title="PDF Highlighter", page_icon=":speech_balloon:")
 deleteOutput()
+createFolders()
 
 
 uploaded_files = st.sidebar.file_uploader("Upload PDF files", accept_multiple_files=True, type="pdf")
