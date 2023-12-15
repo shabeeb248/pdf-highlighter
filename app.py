@@ -3,10 +3,10 @@ import fitz
 import os
 import pandas as pd
 import shutil
+import re
 # Ensure necessary directories exist
 directories = ["Input folder", "Working folder", "Output folder"]
-def deleteOutput():
-    folder = 'Output folder'
+def deleteOutput(folder):
     file_path='downloads.zip'
     if os.path.isfile(file_path) or os.path.islink(file_path):
         os.unlink(file_path)
@@ -31,29 +31,35 @@ def createFolders():
             if not os.path.exists(dir):
                 os.makedirs(dir, exist_ok=True)
                 print("DIRECTORIES CREATED")
-            else:
-                print("DIRECTORY ALREADY EXIST")
+            # else:
+                # print("DIRECTORY ALREADY EXIST")
     except Exception as e:
         ('Failed to create folders  Reason: %s' % ( e))
 
 # Keyword lists
 list_1 = [' freeze ', ' froze ', ' frozen ', ' freezing ', ' cease ', ' ceasement ', ' cessation ', ' ceasing ', 
           ' ceased ', ' ceases ', ' halt ', ' halted ', ' stop ', ' stopped ', ' restructure ', ' restructuring ', 
-          ' restructured ', ' conversion ', ' converted ', ' replacement ', ' replace ', ' replaced ', ' redesign ', 
+          ' restructured ', ' conversion ', ' replacement ', ' replaced ', ' redesign ', 
           ' redesigned ', ' renegotiate ', ' renegotiated ', ' end ', ' ended ', ' terminate ', ' terminated phase out ', 
-          ' phased out ', ' convert ', ' converted ', ' replace ', ' replaced ', ' revise ', ' revised change ', 
-          ' changed ', ' changes ', ' stop ', ' stopped ', ' discontinue discontinued ', ' end ', ' shutdown ', 
+          ' phased out ', ' convert ', ' replace ', ' revise ', ' revised change ', 
+          ' changed ', ' changes ', ' discontinue discontinued ', ' end ', ' shutdown ', 
           ' prevent ', ' prevented ', ' prevented close ', ' closed ', ' transitioned ', ' transition ', 
-          ' transitioning ', ' lump sum ', ' annuity ', ' convert ', ' converted ', ' converting ', ' amend ', 
-          ' amended amending ', ' amendment ', ' amendments ', ' no future ', ' lump sum ', ' eligible ', 
+          ' transitioning ', ' lump sum ', ' annuity ', ' converted ', ' converting ', ' amend ', 
+          ' amended amending ', ' amendment ', ' amendments ', ' eligible ', 
           ' terminated ', ' terminate no longer ', ' no future ', ' not eligible ', ' not participate ', ' covered ', ' cover ']
 
-list_2 = [' defined ', ' defined benefit ', ' pension ', ' postretirement ', ' postemployment ', ' retirement ', 
-          ' benefit ', ' benefits ', ' new ', ' defined contribution ', ' contributions ', ' future ', ' benefits ', 
-          ' accruals ', ' employees ', ' employee ', ' participants ', ' plans ', ' plan ', ' 401(k) ', ' 401 ', 
-          ' contributions ', ' contribution ', ' effective ', ' benefit ', ' plans ', ' Participant ', ' effective ', 
+list_2 = [' defined ', ' pension ', ' postretirement ', ' postemployment ', 
+          ' benefit ', ' new ', ' future ', ' benefits ', 
+          ' accruals ', ' employees ', ' employee ' , ' plans ', ' plan ', ' 401(k) ', ' 401 ', 
+          ' contributions ', ' contribution ', ' effective ', ' Participant ',  
           ' participants ', ' hires ', ' entrants ', ' retirement ']
 
+newList1 =[]
+for i in list_1:
+    newList1.append(''.join(letter for letter in i if letter.isalnum()))
+newList2 =[]
+for i in list_2:
+    newList2.append(''.join(letter for letter in i if letter.isalnum()))
 
 # Function to highlight keywords in PDF
 # def highlight_keyword_in_pdf(file_name, keywords_1, keywords_2):
@@ -113,15 +119,50 @@ def highlight_keyword_in_pdf(file_name, keywords_1, keywords_2):
 
     for page_number in range(len(document)):
         page = document[page_number]
-        for k in keywords_1:
-            text_instances_1 = page.search_for(k)
-            for j in keywords_2:
-                text_instances_2 = page.search_for(j)
-                if text_instances_1 and text_instances_2:
-                    highlight_instances(page, text_instances_1, (1, 0.5, 0.5)) # Highlight color can be changed
-                    highlight_instances(page, text_instances_2, (0.5, 1, 0.5)) # Different color for second set of keywords
-                    for inst in text_instances_1 + text_instances_2:
-                        highlights_data.append([file_name, page_number + 1, k.strip(), j.strip()])
+        final_text_instance_1=[]
+        final_text_instance_2=[]
+        text = page.get_text()
+        text = re.sub(r"[^a-zA-Z0-9]+", ' ', text)
+        # text= ''.join(letter for letter in text if letter.isalnum() or letter.isSp)
+        # st.write(text)
+        for word in text.split(" "):
+            # print(word)
+            if(word.lower() in keywords_1):
+                print(word,"YES")
+                for i in keywords_2:
+                    text_instances_2 = page.search_for(i)
+                    if(text_instances_2):
+                        print(word,i)
+                        text_instances_1=page.search_for(word)
+                        if text_instances_1 not in final_text_instance_1:
+                            final_text_instance_1.append(text_instances_1)
+                        if text_instances_2 not in final_text_instance_2:
+                            final_text_instance_2.append(text_instances_2)
+                        for inst in text_instances_1 + text_instances_2:
+                            highlights_data.append([file_name, page_number + 1, word.strip(), i.strip()])
+                        break
+
+        #             if text_instances_2 not in final_text_instance_2:
+        #                 final_text_instance_2.append(text_instances_2)
+        # for word in page.extract_text():
+        #     st.write(word)
+        # for k in keywords_1:
+        #     text_instances_1 = page.search_for(k)
+        #     for j in keywords_2:
+        #         text_instances_2 = page.search_for(j)
+        #         if text_instances_1 and text_instances_2:
+        #             # highlight_instances(page, text_instances_1, (1, 0.5, 0.5)) # Highlight color can be changed
+        #             # highlight_instances(page, text_instances_2, (0.5, 1, 0.5)) # Different color for second set of keywords
+        #             if text_instances_1 not in final_text_instance_1:
+        #                 final_text_instance_1.append(text_instances_1)
+        #             if text_instances_2 not in final_text_instance_2:
+        #                 final_text_instance_2.append(text_instances_2)
+        #             for inst in text_instances_1 + text_instances_2:
+        #                 highlights_data.append([file_name, page_number + 1, k.strip(), j.strip()])
+        for i in final_text_instance_1:
+            highlight_instances(page, i, (1, 0.5, 0.5)) # Highlight color can be changed
+        for i in final_text_instance_2:
+            highlight_instances(page, i, (0.5, 1, 0.5))
 
     document.save(output_pdf_path)
     document.close()
@@ -136,7 +177,9 @@ def highlight_instances(page, instances, color):
 
 # Streamlit UI
 st.set_page_config(page_title="PDF Highlighter", page_icon=":speech_balloon:")
-deleteOutput()
+deleteOutput('Output folder')
+deleteOutput('Input folder')
+
 createFolders()
 
 
@@ -152,7 +195,9 @@ if uploaded_files and st.sidebar.button("Highlight Keywords"):
                 f.write(uploaded_file.getbuffer())
             
             # Process the PDF file
-            highlights_data, output_pdf_path = highlight_keyword_in_pdf(uploaded_file.name, list_1, list_2)
+            # highlights_data, output_pdf_path = highlight_keyword_in_pdf(uploaded_file.name, list_1, list_2)x
+            highlights_data, output_pdf_path = highlight_keyword_in_pdf(uploaded_file.name, newList2, list_1)
+
             all_highlights.extend(highlights_data)
             st.success(f"Keywords highlighted in {uploaded_file.name}.")
    
@@ -161,8 +206,9 @@ if uploaded_files and st.sidebar.button("Highlight Keywords"):
 if all_highlights:
     # Create a DataFrame and display it
     df = pd.DataFrame(all_highlights, columns=["File Name", "Page Number", "Keyword 1", "Keyword 2"])
+    df=df.drop_duplicates()
     st.dataframe(df)
-
+    
     # Convert DataFrame to CSV and create download link
     csv = df.to_csv(index=False).encode('utf-8')
     csv = df.to_csv("Output folder/a.csv")
