@@ -6,7 +6,7 @@ import shutil
 # Ensure necessary directories exist
 directories = ["Input folder", "Working folder", "Output folder"]
 def deleteOutput():
-    folder = 'Output Folder'
+    folder = 'Output folder'
     file_path='downloads.zip'
     if os.path.isfile(file_path) or os.path.islink(file_path):
         os.unlink(file_path)
@@ -165,27 +165,27 @@ if all_highlights:
 
     # Convert DataFrame to CSV and create download link
     csv = df.to_csv(index=False).encode('utf-8')
-    csv = df.to_csv("Output Folder/a.csv")
-    shutil.make_archive('downloads', 'zip', "Output Folder")
+    csv = df.to_csv("Output folder/a.csv")
+    shutil.make_archive('downloads', 'zip', "Output folder")
     st.download_button(label=f"Download", data=open('downloads.zip', "rb"), file_name='output.zip', mime="application/zip")
 
 
     # csv.save()
     # st.download_button(label="Download Highlight Details as CSV", data=csv, file_name="highlight_details.csv", mime="text/csv")
 
-# if os.path.exists("Output Folder"):
-#         if st.button("Convert Output Folder to ZIP"):
-#             shutil.make_archive('downloads', 'zip', "Output Folder")
+# if os.path.exists("Output folder"):
+#         if st.button("Convert Output folder to ZIP"):
+#             shutil.make_archive('downloads', 'zip', "Output folder")
 #             st.download_button(label=f"Download ", data=open('downloads.zip', "rb"), file_name='1.zip', mime="application/zip")
 
-        # out_files = os.listdir("Output Folder")
+        # out_files = os.listdir("Output folder")
         # if len(out_files)>0:
-        #     st.write("Output Folder has data. Delete if you want to generate new data")
+        #     st.write("Output folder has data. Delete if you want to generate new data")
         #     if(st.button("Delete Output Files")):
         #         os.rem
         # for i in out_files:
         #     output_pdf_path = os.path.join("Output folder", i)
         #     st.download_button(label=f"Download Highlighted PDF {i}", data=open(output_pdf_path, "rb"), file_name=i, mime="application/pdf")
-# if st.button("Convert Output Folder to ZIP"):
-#     shutil.make_archive('downloads', 'zip', "Output Folder")
+# if st.button("Convert Output folder to ZIP"):
+#     shutil.make_archive('downloads', 'zip', "Output folder")
 #     st.download_button(label=f"Download", data=open('downloads.zip', "rb"), file_name='1.zip', mime="application/zip")
